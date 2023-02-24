@@ -1,0 +1,2 @@
+docs.start:
+	mkdocs serve
