@@ -1,0 +1,93 @@
+{
+	"info": {
+		"_postman_id": "6a5fa359-f384-453f-bf58-f54392f9df53",
+		"name": "TasksList",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GetTasks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{API_ID}}.execute-api.{{AWS_REGION}}.amazonaws.com/tasks",
+					"protocol": "https",
+					"host": [
+						"{{API_ID}}",
+						"execute-api",
+						"{{AWS_REGION}}",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"tasks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PostTask",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"label\": \"Something to do today\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{API_ID}}.execute-api.{{AWS_REGION}}.amazonaws.com/tasks",
+					"protocol": "https",
+					"host": [
+						"{{API_ID}}",
+						"execute-api",
+						"{{AWS_REGION}}",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"tasks"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "API_ID",
+			"value": "170di1w1s5",
+			"type": "default"
+		},
+		{
+			"key": "AWS_REGION",
+			"value": "eu-west-2"
+		}
+	]
+}

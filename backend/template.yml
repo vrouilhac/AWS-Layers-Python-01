@@ -16,48 +16,34 @@ Parameters:
     Description: The environement for this project
     Default: main
 
-Globals:
-  Function:
-    Handler: app.handler
-    Runtime: python3.9
-    Timeout: 3
-
 Resources:
-  LibsLayer:
-    Type: AWS::Serverless::LayerVersion
+  FunctionLayer:
+    Type: AWS::Serverless::Application
     Properties:
-      LayerName: !Sub ${Project}-${Env}-${Stage}-libs-layer
-      Description: The libs for functions code
-      ContentUri: src/layers/libs
-      CompatibleRuntimes:
-        - python3.9
-      RetentionPolicy: Retain
-    Metadata:
-      BuildMethod: makefile
+      Location: src/layers/template.yml
+      Parameters:
+        BaseName: !Sub ${Project}-${Env}-${Stage}
 
-  TaskslistApi:
-    Type: AWS::Serverless::HttpApi
+  Database:
+    Type: AWS::Serverless::Application
     Properties:
-      CorsConfiguration:
-        AllowMethods:
-          - GET
-          - OPTIONS
-        AllowHeaders:
-          - "*"
-        AllowOrigins:
-          - "*"
+      Location: src/database/template.yml
+      Parameters:
+        BaseName: !Sub ${Project}-${Env}-${Stage}
 
-  GetTasksFunction:
-    Type: AWS::Serverless::Function
+  FunctionsIntegration:
+    Type: AWS::Serverless::Application
     Properties:
-      CodeUri: src/functions/get-tasks
-      FunctionName: !Sub ${Project}-${Env}-${Stage}-get-tasks-fn
-      Layers:
-        - !Ref LibsLayer
-      Events:
-        TaskslistApi:
-          Type: HttpApi
-          Properties:
-            Path: /tasks
-            Method: GET
-            ApiId: !Ref TaskslistApi
+      Location: src/functions/template.yml
+      Parameters:
+        BaseName: !Sub ${Project}-${Env}-${Stage}
+        Layer: !GetAtt FunctionLayer.Outputs.Layer
+
+  Apis:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: src/apis/template.yml
+      Parameters:
+        BaseName: !Sub ${Project}-${Env}-${Stage}
+        GetTasksFunctionArn: !GetAtt FunctionsIntegration.Outputs.GetTasksFunctionArn
+        PostTaskFunctionArn: !GetAtt FunctionsIntegration.Outputs.PostTaskFunctionArn

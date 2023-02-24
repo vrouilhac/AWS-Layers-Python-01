@@ -1,0 +1,34 @@
+openapi: 3.0.1
+info: 
+  title: 
+    Fn::Sub: ${BaseName}-api
+  version: '1.0'
+paths:
+  /tasks:
+    get:
+      responses:
+        default:
+          description: Default response for GET /tasks
+      x-amazon-apigateway-integration:
+        credentials:
+          Fn::GetAtt: [TaskslistHttpApiExecutionRole, Arn]
+        payloadFormatVersion: "2.0"
+        type: aws_proxy
+        httpMethod: POST
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetTasksFunctionArn}/invocations
+        connectionType: INTERNET
+    post:
+      responses:
+        default:
+          description: Default response for POST /tasks
+      x-amazon-apigateway-integration:
+        credentials:
+          Fn::GetAtt: [TaskslistHttpApiExecutionRole, Arn]
+        payloadFormatVersion: "2.0"
+        type: aws_proxy
+        httpMethod: POST
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostTaskFunctionArn}/invocations
+        connectionType: INTERNET
+x-amazon-apigateway-importexport-version: "1.0"

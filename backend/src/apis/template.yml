@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Tasklist Apis Definition
+
+Parameters:
+  GetTasksFunctionArn:
+    Type: String
+    Description: The lambda arn for the 'get-tasks' function
+  PostTaskFunctionArn:
+    Type: String
+    Description: The lambda arn for the 'post-tasks' function
+  BaseName: 
+    Type: String
+    Description: Base name for this project composed with <Project>-<Env>-<Stage>
+
+Resources:
+  TaskslistHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - "*"
+        AllowOrigins:
+          - "*"
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: api-definitions.yml
+
+  TaskslistHttpApiExecutionRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - apigateway.amazonaws.com
+              Action:
+                - "sts:AssumeRole"
+        Policies:
+          - PolicyName: TaskslistHttpApiExecutionPolicy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Action: lambda:*
+                  Effect: Allow
+                  Resource:
+                    - Ref: GetTasksFunctionArn
+                    - Ref: PostTaskFunctionArn
+
+Outputs:
+  Api:
+    Description: Taskslist HttpApi
+    Value: !Ref TaskslistHttpApi

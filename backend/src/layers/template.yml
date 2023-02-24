@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Taskslist Layer Stack
+
+Parameters:
+  BaseName: 
+    Type: String
+    Description: Base name for this project composed with <Project>-<Env>-<Stage>
+
+Resources:
+  LibsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub ${BaseName}-libs-layer
+      Description: The libs for functions code
+      ContentUri: libs
+      CompatibleRuntimes:
+        - python3.9
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+
+Outputs:
+  Layer:
+    Description: Layer Arn for Taskslist's Libraries
+    Value: !Ref LibsLayer
+

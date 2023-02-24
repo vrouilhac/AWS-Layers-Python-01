@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Tasklist Functions integration
+
+Parameters:
+  Layer:
+    Type: String
+    Description: The name of the libs layer
+  BaseName: 
+    Type: String
+    Description: Base name for this project composed with <Project>-<Env>-<Stage>
+
+Globals:
+  Function:
+    Handler: app.handler
+    Runtime: python3.9
+    Timeout: 3
+
+Resources:
+  GetTasksFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get-tasks
+      FunctionName: !Sub ${BaseName}-get-tasks-fn
+      Layers:
+        - !Ref Layer
+
+  GetTasksFunctionLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${BaseName}-get-tasks-fn
+      RetentionInDays: 7
+
+  PostTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: post-task
+      FunctionName: !Sub ${BaseName}-post-task-fn
+      Layers:
+        - !Ref Layer
+
+  PostTaskFunctionLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${BaseName}-post-task-fn
+      RetentionInDays: 7
+
+Outputs:
+  GetTasksFunctionArn:
+    Description: Name of 'get-tasks' function
+    Value: !GetAtt GetTasksFunction.Arn
+  PostTaskFunctionArn:
+    Description: Name of 'post-task' function
+    Value: !GetAtt PostTaskFunction.Arn
