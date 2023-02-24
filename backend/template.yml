@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Tasklist Backend
+
+Parameters:
+  Project: 
+    Type: String
+    Description: A shorthand for the project name to cluster resources
+    Default: todolist
+  Stage:
+    Type: String
+    Description: The stage for this backend
+    Default: dev
+  Env:
+    Type: String
+    Description: The environement for this project
+    Default: main
+
+Globals:
+  Function:
+    Handler: app.handler
+    Runtime: python3.9
+    Timeout: 3
+
+Resources:
+  LibsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub ${Project}-${Env}-${Stage}-libs-layer
+      Description: The libs for functions code
+      ContentUri: src/layers/libs
+      CompatibleRuntimes:
+        - python3.9
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+
+  TaskslistApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - OPTIONS
+        AllowHeaders:
+          - "*"
+        AllowOrigins:
+          - "*"
+
+  GetTasksFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/functions/get-tasks
+      FunctionName: !Sub ${Project}-${Env}-${Stage}-get-tasks-fn
+      Layers:
+        - !Ref LibsLayer
+      Events:
+        TaskslistApi:
+          Type: HttpApi
+          Properties:
+            Path: /tasks
+            Method: GET
+            ApiId: !Ref TaskslistApi
